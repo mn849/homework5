@@ -1,0 +1,117 @@
+{
+  "connection": {
+    "server": "campus-customs",
+    "config": ".mcp.json",
+    "transport": "stdio"
+  },
+  "tests": [
+    {
+      "prompt": "Use the Campus Customs MCP server to resolve open customer-order ticket 101. Check the requested Bulldog tee size and the linked invoice using database records.",
+      "tool_name": "resolve_customer_order_ticket",
+      "tool_output": {
+        "ticket": {
+          "id": 101,
+          "type": "customer_order",
+          "requester": "Tauhid Zaman",
+          "subject": "Bulldog tee",
+          "sku": "CC-TEE-WHITE",
+          "size": "S",
+          "qty": 1,
+          "lease_id": null,
+          "invoice_id": 501,
+          "status": "open",
+          "notes": "Needs a tee in size S.",
+          "created_at": "2026-08-31T09:15:00-04:00"
+        },
+        "requested_inventory": {
+          "sku": "CC-TEE-WHITE",
+          "name": "Classic Bulldog Tee",
+          "size": "S",
+          "qty": 0,
+          "location": "Aisle B"
+        },
+        "related_invoice": {
+          "id": 501,
+          "vendor_id": 1,
+          "amount": 840.0,
+          "due_date": "2026-08-28",
+          "status": "open",
+          "description": "Rush reprint CC-TEE-WHITE S"
+        }
+      },
+      "is_error": false
+    },
+    {
+      "prompt": "Use the Campus Customs MCP server to resolve open rent-notice ticket 102. Return the linked lease and current checking account record from the database.",
+      "tool_name": "resolve_rent_notice_ticket",
+      "tool_output": {
+        "ticket": {
+          "id": 102,
+          "type": "rent_notice",
+          "requester": "Elm City Properties",
+          "subject": "Rent due",
+          "sku": null,
+          "size": null,
+          "qty": null,
+          "lease_id": 1,
+          "invoice_id": null,
+          "status": "open",
+          "notes": "Email: shop rent due in 2 days.",
+          "created_at": "2026-08-31T11:05:00-04:00"
+        },
+        "lease": {
+          "id": 1,
+          "space_name": "Chapel Street shop",
+          "landlord": "Elm City Properties",
+          "monthly_rent": 2400.0,
+          "next_due": "2026-09-02",
+          "notes": null
+        },
+        "cash_account": {
+          "name": "checking",
+          "balance": 3400.0,
+          "date": "2026-08-31"
+        }
+      },
+      "is_error": false
+    },
+    {
+      "prompt": "Use the Campus Customs MCP server to resolve open bulk price-override ticket 103. Check the recorded hoodie pricing and requested size inventory before deciding anything.",
+      "tool_name": "resolve_bulk_price_override_ticket",
+      "tool_output": {
+        "ticket": {
+          "id": 103,
+          "type": "price_override",
+          "requester": "Yale AI Club",
+          "subject": "Bulk hoodie discount",
+          "sku": "CC-HOOD-NAVY",
+          "size": "M",
+          "qty": 20,
+          "lease_id": null,
+          "invoice_id": null,
+          "status": "open",
+          "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.",
+          "created_at": "2026-08-31T16:55:00-04:00"
+        },
+        "pricing": {
+          "sku": "CC-HOOD-NAVY",
+          "unit_cost": 22.0,
+          "list_price": 58.0
+        },
+        "requested_inventory": {
+          "sku": "CC-HOOD-NAVY",
+          "name": "Basic Hoodie Big Yale",
+          "size": "M",
+          "qty": 8,
+          "location": "Aisle A"
+        }
+      },
+      "is_error": false
+    }
+  ],
+  "tools_listed": [
+    "resolve_customer_order_ticket",
+    "resolve_rent_notice_ticket",
+    "resolve_bulk_price_override_ticket"
+  ]
+}

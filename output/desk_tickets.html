@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Customs Desk — Expected Ticket Workflows</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, sans-serif; background: #f4f6f8; color: #172033; }
+    body { margin: 0; padding: 2rem; }
+    main { max-width: 900px; margin: auto; background: white; border: 1px solid #d8dee8; border-radius: 12px; padding: 1.5rem; box-shadow: 0 8px 24px #17203314; }
+    h1 { margin-top: 0; color: #12355b; }
+    .tabs { display: flex; flex-wrap: wrap; gap: .5rem; border-bottom: 1px solid #d8dee8; padding-bottom: .75rem; }
+    button { border: 1px solid #b7c2d2; border-radius: 999px; background: #f7f9fb; color: #172033; padding: .55rem .9rem; cursor: pointer; font-weight: 650; }
+    button[aria-selected="true"] { background: #12355b; color: white; border-color: #12355b; }
+    [role="tabpanel"] { padding-top: 1.25rem; }
+    .panel { border: 1px solid #d8dee8; border-radius: 10px; padding: 1rem; margin: 1rem 0; }
+    .panel h2 { margin-top: 0; font-size: 1.15rem; color: #12355b; }
+    .actual { min-height: 5rem; border: 1px dashed #aeb9c8; background: #fbfcfd; color: #667085; }
+    code { background: #eef2f6; border-radius: 4px; padding: .1rem .3rem; }
+    li { margin: .55rem 0; }
+    .stub { color: #667085; min-height: 8rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Campus Customs Desk</h1>
+  <p>Expected workflows are preserved above the Actual notes recorded from the live dashboard runs.</p>
+  <div class="tabs" role="tablist" aria-label="Desk sections">
+    <button role="tab" aria-selected="true" aria-controls="ticket-101" id="tab-101">Ticket 101</button>
+    <button role="tab" aria-selected="false" aria-controls="ticket-102" id="tab-102">Ticket 102</button>
+    <button role="tab" aria-selected="false" aria-controls="ticket-103" id="tab-103">Ticket 103</button>
+    <button role="tab" aria-selected="false" aria-controls="cash" id="tab-cash">Cash</button>
+    <button role="tab" aria-selected="false" aria-controls="reflection" id="tab-reflection">Reflection</button>
+  </div>
+
+  <section id="ticket-101" role="tabpanel" aria-labelledby="tab-101">
+    <h2>Ticket 101 — Bulldog tee, size S</h2>
+    <div class="panel"><h2>Expected</h2>
+      <p><strong>First call:</strong> Boss should call <strong>Inventory</strong> first because the request is about one specific SKU and size, and availability determines whether Customer Service can offer a next step.</p>
+      <p><strong>Expected handoff:</strong> Inventory should hand the result to <strong>Accounting</strong> because the ticket links invoice 501; Accounting must check whether the invoice is open or overdue before anyone promises fulfillment.</p>
+      <p><strong>MCP tools:</strong> <code>resolve_customer_order_ticket</code> for the ticket, size-specific inventory, and linked invoice; <code>get_business_context</code> to compare the invoice due date with the recorded business date.</p>
+    </div>
+    <div class="panel actual"><h2>Actual</h2>
+      <p><strong>Result:</strong> Resolved after the team completed its review; no shipment or cash action was authorized because size-S stock was 0 and invoice 501 was open/overdue.</p>
+      <p><strong>Agents and delegation:</strong> Boss first consulted Inventory and Customer Service. Inventory then handed the linked-invoice review to Accounting. Boss synthesized the final customer-safe response.</p>
+      <p><strong>MCP tools used:</strong> Boss used <code>list_open_tickets</code>, <code>get_business_context</code>, and <code>resolve_customer_order_ticket</code>; Inventory used <code>list_open_tickets</code> and <code>resolve_customer_order_ticket</code>; Customer Service used <code>list_open_tickets</code>, <code>get_business_context</code>, and <code>resolve_customer_order_ticket</code>; Accounting used <code>resolve_customer_order_ticket</code> and <code>get_business_context</code>.</p>
+    </div>
+  </section>
+
+  <section id="ticket-102" role="tabpanel" aria-labelledby="tab-102" hidden>
+    <h2>Ticket 102 — Rent due</h2>
+    <div class="panel"><h2>Expected</h2>
+      <p><strong>First call:</strong> Boss should call <strong>Facilities</strong> first because this is a lease and rent-notice issue, so the linked lease and due date are the primary facts.</p>
+      <p><strong>Expected handoff:</strong> Facilities should hand the lease timing and cash question to <strong>Accounting</strong> so Accounting can compare the checking balance and any payment evidence before a human decides what to pay.</p>
+      <p><strong>MCP tools:</strong> <code>resolve_rent_notice_ticket</code> for the ticket, lease, and checking account; <code>get_business_context</code> to assess the recorded due date relative to the business date.</p>
+    </div>
+    <div class="panel actual"><h2>Actual</h2>
+      <p><strong>Result:</strong> Resolved after the lease and cash review; no payment was made because the rent is due 2026-09-02 and no payment status was recorded.</p>
+      <p><strong>Agents and delegation:</strong> Boss consulted Facilities and Accounting. Facilities reviewed the lease and then handed the payment-status question to Accounting. Accounting asked Boss for a sourced check, creating an additional Boss↔Accounting verification loop before Boss closed the workflow.</p>
+      <p><strong>MCP tools used:</strong> Boss used <code>list_open_tickets</code>, <code>get_business_context</code>, and <code>resolve_rent_notice_ticket</code>; Facilities used <code>get_business_context</code> and <code>resolve_rent_notice_ticket</code>; Accounting used <code>get_business_context</code>, <code>list_open_tickets</code>, and <code>resolve_rent_notice_ticket</code>.</p>
+    </div>
+  </section>
+
+  <section id="ticket-103" role="tabpanel" aria-labelledby="tab-103" hidden>
+    <h2>Ticket 103 — Bulk hoodie discount</h2>
+    <div class="panel"><h2>Expected</h2>
+      <p><strong>First call:</strong> Boss should call <strong>Inventory</strong> first because the club requests 20 hoodies in size M, and the recorded quantity must be checked before discussing a bulk price.</p>
+      <p><strong>Expected handoff:</strong> Inventory should hand the available quantity and requested order size to <strong>Accounting</strong>, which can compare the recorded unit cost and list price. A human must approve any discount.</p>
+      <p><strong>MCP tools:</strong> <code>resolve_bulk_price_override_ticket</code> for the ticket, size-specific inventory, and pricing; <code>get_business_context</code> only if the team needs the recorded operating date for its recommendation.</p>
+    </div>
+    <div class="panel actual"><h2>Actual</h2>
+      <p><strong>Result:</strong> Resolved after review; no purchase or price override was made because only 8 of the requested 20 size-M hoodies were in stock and no approved discount policy was recorded.</p>
+      <p><strong>Agents and delegation:</strong> Boss sent the request to Inventory, which checked the exact size and quantity. Boss then confirmed the pricing evidence and returned a human-approval recommendation; Accounting was not needed for this run.</p>
+      <p><strong>MCP tools used:</strong> Boss used <code>list_open_tickets</code>, <code>get_business_context</code>, and <code>resolve_bulk_price_override_ticket</code>; Inventory used <code>resolve_bulk_price_override_ticket</code>. No payment or human approval occurred.</p>
+    </div>
+  </section>
+
+  <section id="cash" role="tabpanel" aria-labelledby="tab-cash" hidden>
+    <h2>Cash</h2>
+    <div class="panel"><h2>Starting balance after reset</h2><p><strong>$3,400.00</strong> in checking on 2026-08-31.</p></div>
+    <div class="panel"><h2>Ticket-by-ticket financial impact</h2>
+      <ul>
+        <li><strong>101 — $0.00:</strong> invoice 501 is open/overdue for $840.00, but no payment was approved or posted; checking remains $3,400.00.</li>
+        <li><strong>102 — $0.00:</strong> rent of $2,400.00 is due 2026-09-02, but no payment was approved or posted; checking remains $3,400.00.</li>
+        <li><strong>103 — $0.00:</strong> the requested 20 hoodies could not be fulfilled from 8 available units, and no purchase or discount was approved; checking remains $3,400.00.</li>
+      </ul>
+    </div>
+    <div class="panel"><h2>Ending balance</h2><p><strong>$3,400.00</strong> — matches <code>cash_accounts.balance</code> in <code>data/campus_customs_new.db</code>. Payments recorded: none.</p></div>
+  </section>
+  <section id="reflection" role="tabpanel" aria-labelledby="tab-reflection" hidden>
+    <h2>Reflection</h2>
+    <div class="panel"><h2>What the live run showed</h2>
+      <p>I judge the team successful on evidence and safety, but uneven on efficiency. All three workflows reached a resolved database status, and the Cash tab proves that checking stayed at <strong>$3,400.00</strong> because no payment, purchase, or price override was approved. That is a good result for a human-guarded shop: the team did not turn an uncertain recommendation into a money movement.</p>
+    </div>
+    <div class="panel"><h2>Ticket 101 — Bulldog tee</h2>
+      <p><strong>Performance:</strong> Strong. Inventory found the decisive fact quickly: <strong>0</strong> size-S CC-TEE-WHITE units in Aisle B. Accounting then confirmed invoice 501 was open for <strong>$840</strong> and overdue against the MCP business date of 2026-08-31. Customer Service produced wording that did not promise shipment. The team correctly left cash unchanged and avoided a false fulfillment commitment.</p>
+      <p><strong>Expected versus actual:</strong> I expected Boss → Inventory, then Inventory → Accounting, with the customer-facing response handled after the facts were known. Actual Boss called Inventory and Customer Service in parallel, Inventory handed the invoice question to Accounting, and Boss also rechecked the customer-order tool. The extra Customer Service branch made the response more useful, but it was more work than my focused plan predicted.</p>
+      <p><strong>Human approval:</strong> None. Any payment or shipment decision remained behind the human gate.</p>
+    </div>
+    <div class="panel"><h2>Ticket 102 — Rent due</h2>
+      <p><strong>Performance:</strong> Careful but inefficient. Facilities correctly used the lease record to identify <strong>$2,400</strong> due on 2026-09-02, while Accounting checked the <strong>$3,400</strong> checking balance and found no payment record. The final answer correctly said rent was due in two days, not overdue, and did not spend cash without approval.</p>
+      <p><strong>Expected versus actual:</strong> I expected Boss → Facilities, then Facilities → Accounting. Actual began that way, but Accounting asked Boss for another sourced verification and Boss and Accounting looped back through the rent tool. The extra loop added latency without changing the answer. A clearer handoff contract—Facilities supplies lease timing, Accounting supplies payment status, then Boss closes—would have been enough.</p>
+      <p><strong>Human approval:</strong> None. The team staged a recommendation only; it did not authorize the $2,400 rent.</p>
+    </div>
+    <div class="panel"><h2>Ticket 103 — Bulk hoodie discount</h2>
+      <p><strong>Performance:</strong> Most efficient. Boss sent the request to Inventory, which found <strong>8</strong> size-M hoodies against the Yale AI Club request for 20 and returned the recorded <strong>$58 list price / $22 unit cost</strong>. Boss correctly declined to invent a discount policy and flagged human approval.</p>
+      <p><strong>Expected versus actual:</strong> This almost exactly matched my plan: Boss → Inventory, then Boss synthesized the pricing recommendation. Accounting was not needed because the single MCP pricing record already supplied list price and cost, and no purchase occurred.</p>
+      <p><strong>Human approval:</strong> None. The proposed override remained a human decision and cash stayed unchanged.</p>
+    </div>
+    <div class="panel"><h2>What could be simpler with one agent?</h2>
+      <p>Ticket 103 is the clearest single-agent case. One agent with the bulk-pricing MCP tool could check 8 versus 20, report $58/$22, and stop for approval without delegation. Ticket 101 could also be handled by one agent with the customer-order tool because that one result already contains inventory and invoice evidence; a separate Customer Service handoff mainly changed wording. Ticket 102 benefits more from separation because lease timing and payment evidence are different responsibilities, but even there one agent could call the rent tool once and produce the same “due in two days, no payment recorded” answer. The team is valuable when work is truly parallel or specialized, yet the audit shows that extra delegates can repeat the same MCP lookup.</p>
+    </div>
+    <div class="panel"><h2>Three new problems this team could solve</h2>
+      <ol><li><strong>“Can we fulfill a repeat Bulldog tee request in another recorded size?”</strong> Inventory and Customer Service could use the existing customer-order resolver to report the exact quantity/location and draft a safe answer, while Accounting could check a linked invoice before shipment.</li><li><strong>“Is next month’s rent notice early or overdue?”</strong> Facilities and Accounting could reuse the rent resolver plus business-date context to compare the lease due date and checking evidence without paying automatically.</li><li><strong>“Can the club order a smaller bulk quantity at the recorded price?”</strong> Inventory and the Boss could use the bulk-pricing resolver to compare a new requested quantity with size-M stock and escalate only the discount decision.</li></ol>
+    </div>
+    <div class="panel"><h2>Three problems this team cannot solve yet</h2>
+      <ol><li><strong>Replenish the out-of-stock tee.</strong> The current tools can prove 0 units and show invoice 501, but cannot create a purchase order, contact Bulldog Print Co, or update inventory. I would add vendor-order and receiving MCP tools plus a Procurement agent.</li><li><strong>Actually schedule or reconcile a rent payment.</strong> The team can read the lease and balance, and a human approval route can move cash, but it cannot verify a bank mandate, schedule a future payment, or reconcile a landlord confirmation. I would add a payment-scheduling/bank-confirmation tool and a Treasury agent.</li><li><strong>Complete an order, shipment, refund, or customer cancellation.</strong> The current database has no orders, shipment labels, customer payment gateway, or refund records. I would add Order Fulfillment and Customer Account agents with MCP tools for order creation, carrier status, refund authorization, and customer identity verification.</li></ol>
+    </div>
+  </section>
+</main>
+<script>
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(item => { item.setAttribute('aria-selected', item === tab); document.getElementById(item.getAttribute('aria-controls')).hidden = item !== tab; });
+  }));
+</script>
+</body>
+</html>

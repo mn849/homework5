@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+*.zip
+!hw5.zip
